@@ -1,0 +1,3 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=1479
+
+A modified script to support the syntax of devel versions of mutt, as well as a few of the more common patches. This syntax file is for muttrc files. This is the same script that comes with the official vim, but I'm using this page to store versions of the file that are more recent than the one included in the stable vim release.
