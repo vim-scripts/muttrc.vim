@@ -1,9 +1,8 @@
 " Vim syntax file
 " Language:	Mutt setup files
-" Maintainer:	Preben 'Peppe' Guldberg <peppe-vim@xs4all.nl>
-" Contributor:	Gary Johnson <garyjohn@spk.agilent.com>
-" Contributor:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	23 Feb 2006
+" Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
+" Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
+" Last Change:	8 Mar 2006
 
 " This file covers mutt version 1.5.11
 
@@ -211,9 +210,9 @@ syn keyword muttrcMenu		contained alias attach browser compose editor index page
 syn match muttrcMenuList "\S\+" contained contains=muttrcMenu
 
 syn keyword muttrcCommand	account-hook auto_view alternative_order charset-hook uncolor exec fcc-hook fcc-save-hook unalternative_order
-syn keyword muttrcCommand	folder-hook hdr_order iconv-hook ignore lists mailboxes message-hook mbox-hook my_hdr unmailboxes
-syn keyword muttrcCommand	pgp-hook push save-hook score send-hook send2-hook crypt-hook source unalias unauto_view unhdr_order
-syn keyword muttrcCommand	unhook unignore unlists unmono unmy_hdr unscore
+syn keyword muttrcCommand	folder-hook hdr_order iconv-hook ignore mailboxes message-hook mbox-hook my_hdr unmailboxes
+syn keyword muttrcCommand	pgp-hook push save-hook score send-hook send2-hook crypt-hook source unauto_view unhdr_order
+syn keyword muttrcCommand	unhook unignore unmono unmy_hdr unscore
 syn keyword muttrcCommand	mime_lookup unmime_lookup spam ungroup
 syn keyword muttrcCommand	reply-hook send2-hook nospam unalternative_order
 
@@ -221,8 +220,16 @@ syn match muttrcAttachmentsMimeType contained "[*a-z0-9_-]\+/[*a-z0-9._-]\+\s*" 
 syn match muttrcAttachmentsFlag contained "[+-]\([AI]\|inline\|attachment\)\s\+" skipwhite nextgroup=muttrcAttachmentsMimeType
 syn match muttrcAttachmentsLine "^\s*\(un\)\?attachments\s\+" skipwhite nextgroup=muttrcAttachmentsFlag
 
-syn match muttrcSubscribeLine "^\s*\(un\)\?subscribe\s\+" skipwhite nextgroup=muttrcRXString
-syn match muttrcAlternatesLine "^\s*alternates\s\+" skipwhite nextgroup=muttrcRXString,muttrcEmail
+syn match muttrcUnHighlightSpace contained "\(\s\+\|\\$\)"
+
+syn keyword muttrcListsKeyword	contained lists unlists
+syn region muttrcListsLine	keepend start=+^\s*\(un\)\?lists\s+ skip=+\\$+ end=+$+ contains=muttrcListsKeyword,muttrcGroupDef,muttrcRXPat,muttrcUnHighlightSpace,muttrcComment
+
+syn keyword muttrcSubscribeKeyword	contained subscribe unsubscribe
+syn region muttrcSubscribeLine 	keepend start=+^\s*\(un\)\?subscribe\s+ skip=+\\$+ end=+$+ contains=muttrcSubscribeKeyword,muttrcRXPat,muttrcGroupDef,muttrcUnHighlightSpace,muttrcComment
+
+syn keyword muttrcAlternateKeyword contained alternates unalternates
+syn region muttrcAlternatesLine keepend start=+^\s*\(un\)\?alternates\s+ skip=+\\$+ end=+$+ contains=muttrcAlternateKeyword,muttrcGroupDef,muttrcRXPat,muttrcUnHighlightSpace,muttrcComment
 
 syn match muttrcVariable	"\$[a-zA-Z_-]\+"
 
@@ -267,23 +274,26 @@ syn match   muttrcBindLine	"^\s*bind\s\+\S\+"	skipwhite nextgroup=muttrcBindKey 
 syn keyword muttrcMacro		contained macro		skipwhite nextgroup=muttrcMenuList
 syn match   muttrcMacroLine	"^\s*macro\s\+\S\+"	skipwhite nextgroup=muttrcKey contains=muttrcMacro
 
-syn region muttrcRXPat		contained start=+'+ skip=+\\'+ end=+'+ keepend skipwhite nextgroup=muttrcGroupDef,muttrcAddrDef,muttrcRXDef contains=muttrcRXString
-syn region muttrcRXPat		contained start=+"+ skip=+\\"+ end=+"+ keepend skipwhite nextgroup=muttrcGroupDef,muttrcAddrDef,muttrcRXDef contains=muttrcRXString
+syn region muttrcRXPat		contained start=+'+ skip=+\\'+ end=+'\s*+ keepend skipwhite contains=muttrcRXString nextgroup=muttrcRXPat
+syn region muttrcRXPat		contained start=+"+ skip=+\\"+ end=+"\s*+ keepend skipwhite contains=muttrcRXString nextgroup=muttrcRXPat
+syn region muttrcRXPat		contained start=+[^'"#-]+ end=+\($\|\s\+\)+ keepend skipwhite contains=muttrcRXChars nextgroup=muttrcRXPat
 syn match muttrcRXDef 		contained "-rx\s\+" skipwhite nextgroup=muttrcRXPat
 
-syn match muttrcAddrFlag	contained "-addr"
-syn match muttrcAddrContent	contained "[^-]\S\+\s\+" nextgroup=muttrcGroupDef,muttrcAddrDef,muttrcRXDef,muttrcAddrContent contains=muttrcEmail
-syn match muttrcAddrDef 	contained "-addr\s\+" skipwhite nextgroup=muttrcAddrContent contains=muttrcAddrFlag
+syn match muttrcAddrContent	contained "[a-zA-Z0-9._-]\+@[a-zA-Z0-9./-]\+\s*" skipwhite contains=muttrcEmail nextgroup=muttrcAddrContent
+syn region muttrcAddrContent	contained start=+'+ end=+'\s*+ skip=+\\'+ skipwhite contains=muttrcEmail nextgroup=muttrcAddrContent
+syn region muttrcAddrContent	contained start=+"+ end=+"\s*+ skip=+\\"+ skipwhite contains=muttrcEmail nextgroup=muttrcAddrContent
+syn match muttrcAddrDef 	contained "-addr\s\+" skipwhite nextgroup=muttrcAddrContent
 
 syn match muttrcGroupFlag	contained "-group"
-syn match muttrcGroupName 	contained "\S\+" skipwhite nextgroup=muttrcGroupDef,muttrcAddrDef,muttrcRXDef
-syn match muttrcGroupDef	contained "-group\s\+" skipwhite nextgroup=muttrcGroupName contains=muttrcGroupFlag
+syn region muttrcGroupDef	contained start="-group\s\+" skip="\\$" end="\s" skipwhite keepend contains=muttrcGroupFlag,muttrcUnHighlightSpace
 
-syn match muttrcGroup		"^\s*group" skipwhite nextgroup=muttrcGroupDef,muttrcAddrDef,muttrcRXDef
+syn keyword muttrcGroupKeyword	contained group ungroup
+syn region muttrcGroupLine	keepend start=+^\s*\(un\)\?group\s+ skip=+\\$+ end=+$+ contains=muttrcGroupKeyword,muttrcGroupDef,muttrcAddrDef,muttrcRXDef,muttrcUnHighlightSpace,muttrcComment
 
+" muttrcAlias* stuff is a giant hack. Please fix.
+" (does not support line continuation)
 syn match muttrcAliasGroupName	contained "\S\+\s\+" nextgroup=muttrcAliasGroupDef,muttrcAliasAbbr
 syn match muttrcAliasGroupDef	contained "-group\s\+" nextgroup=muttrcAliasGroupName contains=muttrcGroupFlag
-
 syn match   muttrcAliasEmail	contained "\S\+@\S\+\s\+" contains=muttrcEmail nextgroup=muttrcAliasName
 syn match   muttrcAliasEncEmail	contained "<[^>]\+>" contains=muttrcEmail
 syn match   muttrcAliasNameNoParens contained "[^<(@]\+\s\+" nextgroup=muttrcAliasEncEmail
@@ -291,6 +301,10 @@ syn match   muttrcAliasParens	contained "[()]"
 syn match   muttrcAliasName     contained "([^)]\+)" contains=muttrcAliasParens
 syn match   muttrcAliasAbbr	contained "[^-]\S\+\s\+" nextgroup=muttrcAliasEmail,muttrcAliasNameNoParens
 syn match   muttrcAlias		"^\s*alias\s\+" nextgroup=muttrcAliasGroupDef,muttrcAliasAbbr
+
+syn keyword muttrcUnAliasKeyword	contained unalias
+syn match   muttrcUnAliasAbbr	contained "\S\+\s*" skipwhite nextgroup=muttrcUnAliasAbbr
+syn region  muttrcUnAlias	start=+^\s*unalias\s+ skip=+\\$+ end=+$+ contains=muttrcUnAliasKeyword,muttrcUnAliasAbbr
 
 " Colour definitions takes object, foreground and background arguments (regexps excluded).
 syn keyword muttrcColorField	contained attachment body bold error hdrdefault header index
@@ -333,12 +347,14 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcRXString		String
   HiLink muttrcSpecial		Special
   HiLink muttrcGroupFlag	Type
-  HiLink muttrcAddrFlag		muttrcGroupFlag
+  HiLink muttrcGroupDef		Macro
+  HiLink muttrcAddrDef		muttrcGroupFlag
   HiLink muttrcRXDef		muttrcGroupFlag
   HiLink muttrcRXPat		String
-  HiLink muttrcGroupName	Macro
+  HiLink muttrcAliasGroupDef	Type
   HiLink muttrcAliasGroupName	Macro
   HiLink muttrcAliasAbbr	Identifier
+  HiLink muttrcUnAliasAbbr	Identifier
   HiLink muttrcAliasEncEmail	Identifier
   HiLink muttrcAliasParens	Type
   HiLink muttrcNumber		Number
@@ -362,7 +378,7 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcBind		muttrcCommand
   HiLink muttrcMacro		muttrcCommand
   HiLink muttrcAlias		muttrcCommand
-  HiLink muttrcGroup		muttrcCommand
+  HiLink muttrcUnAliasKeyword	muttrcCommand
   HiLink muttrcAction		Macro
   HiLink muttrcBadAction	Error
   HiLink muttrcFunction		Macro
@@ -372,8 +388,14 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcColor		muttrcCommand
   HiLink muttrcMonoAttrib	muttrcColorFG
   HiLink muttrcMono		muttrcCommand
-  HiLink muttrcSubscribeLine	muttrcCommand
-  HiLink muttrcAlternatesLine	muttrcCommand
+  HiLink muttrcGroupKeyword	muttrcCommand
+  HiLink muttrcGroupLine	Error
+  HiLink muttrcSubscribeKeyword	muttrcCommand
+  HiLink muttrcSubscribeLine	Error
+  HiLink muttrcListsKeyword	muttrcCommand
+  HiLink muttrcListsLine	Error
+  HiLink muttrcAlternateKeyword	muttrcCommand
+  HiLink muttrcAlternatesLine	Error
   HiLink muttrcAttachmentsLine	muttrcCommand
   HiLink muttrcAttachmentsFlag	Type
   HiLink muttrcAttachmentsMimeType	String
