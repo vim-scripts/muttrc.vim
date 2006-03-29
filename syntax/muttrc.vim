@@ -2,7 +2,7 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	8 Mar 2006
+" Last Change:	29 Mar 2006
 
 " This file covers mutt version 1.5.11
 
@@ -40,6 +40,11 @@ syn match  muttrcRXChars	contained "$'"me=e-1
 syn match  muttrcRXChars	contained "\\"
 syn region muttrcRXString	contained start=+'+ skip=+\\'+ end=+'+ contains=muttrcRXChars
 syn region muttrcRXString	contained start=+"+ skip=+\\"+ end=+"+ contains=muttrcRXChars
+
+syn region muttrcRXPat		contained start=+'+ skip=+\\'+ end=+'\s*+ keepend skipwhite contains=muttrcRXString nextgroup=muttrcRXPat
+syn region muttrcRXPat		contained start=+"+ skip=+\\"+ end=+"\s*+ keepend skipwhite contains=muttrcRXString nextgroup=muttrcRXPat
+syn region muttrcRXPat		contained start=+[^'"#-]+ end=+\($\|\s\+\)+ keepend skipwhite contains=muttrcRXChars nextgroup=muttrcRXPat
+syn match muttrcRXDef 		contained "-rx\s\+" skipwhite nextgroup=muttrcRXPat
 
 syn match muttrcSpecial		+\(['"]\)!\1+
 
@@ -223,7 +228,7 @@ syn match muttrcAttachmentsLine "^\s*\(un\)\?attachments\s\+" skipwhite nextgrou
 syn match muttrcUnHighlightSpace contained "\(\s\+\|\\$\)"
 
 syn keyword muttrcListsKeyword	contained lists unlists
-syn region muttrcListsLine	keepend start=+^\s*\(un\)\?lists\s+ skip=+\\$+ end=+$+ contains=muttrcListsKeyword,muttrcGroupDef,muttrcRXPat,muttrcUnHighlightSpace,muttrcComment
+syn region muttrcListsLine	keepend start=+^\s*\(un\)\?lists\s+ skip=+\\$+ end=+$+ contains=muttrcListsKeyword,muttrcRXPat,muttrcGroupDef,muttrcUnHighlightSpace,muttrcComment
 
 syn keyword muttrcSubscribeKeyword	contained subscribe unsubscribe
 syn region muttrcSubscribeLine 	keepend start=+^\s*\(un\)\?subscribe\s+ skip=+\\$+ end=+$+ contains=muttrcSubscribeKeyword,muttrcRXPat,muttrcGroupDef,muttrcUnHighlightSpace,muttrcComment
@@ -273,11 +278,6 @@ syn match   muttrcBindLine	"^\s*bind\s\+\S\+"	skipwhite nextgroup=muttrcBindKey 
 
 syn keyword muttrcMacro		contained macro		skipwhite nextgroup=muttrcMenuList
 syn match   muttrcMacroLine	"^\s*macro\s\+\S\+"	skipwhite nextgroup=muttrcKey contains=muttrcMacro
-
-syn region muttrcRXPat		contained start=+'+ skip=+\\'+ end=+'\s*+ keepend skipwhite contains=muttrcRXString nextgroup=muttrcRXPat
-syn region muttrcRXPat		contained start=+"+ skip=+\\"+ end=+"\s*+ keepend skipwhite contains=muttrcRXString nextgroup=muttrcRXPat
-syn region muttrcRXPat		contained start=+[^'"#-]+ end=+\($\|\s\+\)+ keepend skipwhite contains=muttrcRXChars nextgroup=muttrcRXPat
-syn match muttrcRXDef 		contained "-rx\s\+" skipwhite nextgroup=muttrcRXPat
 
 syn match muttrcAddrContent	contained "[a-zA-Z0-9._-]\+@[a-zA-Z0-9./-]\+\s*" skipwhite contains=muttrcEmail nextgroup=muttrcAddrContent
 syn region muttrcAddrContent	contained start=+'+ end=+'\s*+ skip=+\\'+ skipwhite contains=muttrcEmail nextgroup=muttrcAddrContent
