@@ -2,7 +2,7 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	21 May 2006
+" Last Change:	7 Jun 2006
 
 " This file covers mutt version 1.5.11
 " Included are also a few features from 1.4.2.1
@@ -228,8 +228,8 @@ syn keyword muttrcVarStr	contained smime_encrypt_command smime_encrypt_with smim
 syn keyword muttrcVarStr	contained smime_get_cert_email_command smime_get_signer_cert_command
 syn keyword muttrcVarStr	contained smime_import_cert_command smime_keys smime_pk7out_command smime_sign_as
 syn keyword muttrcVarStr	contained smime_sign_command smime_sign_opaque_command smime_verify_command
-syn keyword muttrcVarStr	contained smime_verify_opaque_command sort sort_alias sort_aux sort_browser
-syn keyword muttrcVarStr	contained spam_separator spoolfile ssl_ca_certificates_file ssl_client_cert
+syn keyword muttrcVarStr	contained smime_verify_opaque_command smtp_url smtp_authenticators sort sort_alias sort_aux
+syn keyword muttrcVarStr	contained sort_browser spam_separator spoolfile ssl_ca_certificates_file ssl_client_cert
 syn keyword muttrcVarStr	contained status_chars status_format tmpdir to_chars tunnel visual
 
 " Present in 1.4.2.1 (pgp_create_traditional was a bool then)
@@ -244,9 +244,13 @@ syn match muttrcMenuCommas /,/ contained
 syn keyword muttrcCommand	auto_view alternative_order charset-hook exec unalternative_order
 syn keyword muttrcCommand	hdr_order iconv-hook ignore mailboxes my_hdr unmailboxes
 syn keyword muttrcCommand	pgp-hook push score source unauto_view unhdr_order
-syn keyword muttrcCommand	unhook unignore unmono unmy_hdr unscore
+syn keyword muttrcCommand	unignore unmono unmy_hdr unscore
 syn keyword muttrcCommand	mime_lookup unmime_lookup spam ungroup
 syn keyword muttrcCommand	nospam unalternative_order
+
+syn keyword muttrcHooks		contained account-hook charset-hook iconv-hook message-hook folder-hook mbox-hook save-hook fcc-hook fcc-save-hook send-hook send2-hook reply-hook crypt-hook
+syn keyword muttrcUnhook	contained unhook
+syn region muttrcUnhookLine	keepend start=+^\s*unhook\s+ skip=+\\$+ end=+$+ contains=muttrcUnhook,muttrcHooks,muttrcUnHighlightSpace,muttrcComment
 
 syn match muttrcAttachmentsMimeType contained "[*a-z0-9_-]\+/[*a-z0-9._-]\+\s*" skipwhite nextgroup=muttrcAttachmentsMimeType
 syn match muttrcAttachmentsFlag contained "[+-]\%([AI]\|inline\|attachment\)\s\+" skipwhite nextgroup=muttrcAttachmentsMimeType
@@ -434,6 +438,7 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcString		String
   HiLink muttrcRXString		String
   HiLink muttrcSpecial		Special
+  HiLink muttrcHooks		Type
   HiLink muttrcGroupFlag	Type
   HiLink muttrcGroupDef		Macro
   HiLink muttrcAddrDef		muttrcGroupFlag
@@ -466,6 +471,8 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcMacro		muttrcCommand
   HiLink muttrcAlias		muttrcCommand
   HiLink muttrcUnAlias		muttrcCommand
+  HiLink muttrcUnhook		muttrcCommand
+  HiLink muttrcUnhookLine	Error
   HiLink muttrcAction		Macro
   HiLink muttrcBadAction	Error
   HiLink muttrcBindFunction	Error
