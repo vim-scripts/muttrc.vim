@@ -2,7 +2,7 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	7 Jun 2006
+" Last Change:	9 Jun 2006
 
 " This file covers mutt version 1.5.11
 " Included are also a few features from 1.4.2.1
@@ -291,7 +291,7 @@ syn match muttrcFunction	contained "\<previous-\%(line\|new\|page\|subthread\|un
 syn match muttrcFunction	contained "\<search\%(-\%(next\|opposite\|reverse\|toggle\)\)\?\>"
 syn match muttrcFunction	contained "\<show-\%(limit\|version\)\>"
 syn match muttrcFunction	contained "\<sort-\%(mailbox\|reverse\)\>"
-syn match muttrcFunction	contained "\<tag-\%(pattern\|prefix\)\>"
+syn match muttrcFunction	contained "\<tag-\%(pattern\|prefix\%(-cond\)\?\)\>"
 syn match muttrcFunction	contained "\<toggle-\%(mailboxes\|new\|quoted\|subscribed\|unlink\|write\)\>"
 syn match muttrcFunction	contained "\<undelete-\%(pattern\|subthread\)\>"
 syn match muttrcFunction	contained "\<collapse-\%(parts\|thread\|all\)\>"
