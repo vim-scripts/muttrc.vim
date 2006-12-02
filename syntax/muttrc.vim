@@ -2,9 +2,9 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	9 Jun 2006
+" Last Change:	2 Dec 2006
 
-" This file covers mutt version 1.5.11
+" This file covers mutt version 1.5.13 (and most of CVS HEAD)
 " Included are also a few features from 1.4.2.1
 
 " For version 5.x: Clear all syntax items
@@ -26,13 +26,13 @@ syn match muttrcComment		"^#.*$"
 syn match muttrcComment		"[^\\]#.*$"lc=1
 
 " Escape sequences (back-tick and pipe goes here too)
-syn match muttrcEscape		+\\[#tnr"'Cc]+
+syn match muttrcEscape		+\\[#tnr"'Cc ]+
 syn match muttrcEscape		+[`|]+
 
 " The variables takes the following arguments
 syn match  muttrcString		"=\s*[^ #"'`]\+"lc=1 contains=muttrcEscape
-syn region muttrcString		start=+"+ms=e skip=+\\"+ end=+"+ contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcMacro,muttrcCommand,muttrcAction
-syn region muttrcString		start=+'+ms=e skip=+\\'+ end=+'+ contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcMacro,muttrcCommand,muttrcAction
+syn region muttrcString		start=+"+ms=e skip=+\\"+ end=+"+ contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcCommand,muttrcAction
+syn region muttrcString		start=+'+ms=e skip=+\\'+ end=+'+ contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcCommand,muttrcAction
 
 syn region muttrcShellString	matchgroup=muttrcEscape keepend start=+`+ skip=+\\`+ end=+`+ contains=muttrcVarStr,muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcCommand,muttrcSet
 
@@ -324,7 +324,15 @@ syn match muttrcBindMenuList	contained /\S\+/ skipwhite contains=muttrcMenu,mutt
 syn match muttrcBindMenuListNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcBindMenuList,muttrcBindMenuListNL
 syn match muttrcBind		/^\s*bind\s\?/ skipwhite nextgroup=muttrcBindMenuList,muttrcBindMenuListNL
 
-syn match muttrcMacroKey	contained /\S\+/ skipwhite contains=muttrcKey
+syn region muttrcMacroDescr	contained keepend skipwhite start=+\s*\S+ms=e skip=+\\ + end=+ \|$+me=s
+syn region muttrcMacroDescr	contained keepend skipwhite start=+'+ms=e skip=+\\'+ end=+'+me=s
+syn region muttrcMacroDescr	contained keepend skipwhite start=+"+ms=e skip=+\\"+ end=+"+me=s
+syn match muttrcMacroDescrNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcMacroDescr,muttrcMacroDescrNL
+syn region muttrcMacroBody	contained skipwhite start="\S" skip='\\ \|\\$' end=' \|$' contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcCommand,muttrcAction nextgroup=muttrcMacroDescr,muttrcMacroDescrNL
+syn region muttrcMacroBody matchgroup=Type contained skipwhite start=+'+ms=e skip=+\\'+ end=+'+me=s contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcCommand,muttrcAction nextgroup=muttrcMacroDescr,muttrcMacroDescrNL
+syn region muttrcMacroBody matchgroup=Type contained skipwhite start=+"+ms=e skip=+\\"+ end=+"+me=s contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcCommand,muttrcAction nextgroup=muttrcMacroDescr,muttrcMacroDescrNL
+syn match muttrcMacroBodyNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcMacroBody,muttrcMacroBodyNL
+syn match muttrcMacroKey	contained /\S\+/ skipwhite contains=muttrcKey nextgroup=muttrcMacroBody,muttrcMacroBodyNL
 syn match muttrcMacroKeyNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcMacroKey,muttrcMacroKeyNL
 syn match muttrcMacroMenuList	contained /\S\+/ skipwhite contains=muttrcMenu,muttrcMenuCommas nextgroup=muttrcMacroKey,muttrcMacroKeyNL
 syn match muttrcMacroMenuListNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcMacroMenuList,muttrcMacroMenuListNL
@@ -341,32 +349,36 @@ syn region muttrcGroupDef	contained start="-group\s\+" skip="\\$" end="\s" skipw
 syn keyword muttrcGroupKeyword	contained group ungroup
 syn region muttrcGroupLine	keepend start=+^\s*\%(un\)\?group\s+ skip=+\\$+ end=+$+ contains=muttrcGroupKeyword,muttrcGroupDef,muttrcAddrDef,muttrcRXDef,muttrcUnHighlightSpace,muttrcComment
 
-syn match muttrcAliasGroupName	contained /\w\+/ skipwhite nextgroup=muttrcAliasGroupDef,muttrcAliasAbbr,muttrcAliasNL
+syn match muttrcAliasGroupName	contained /\w\+/ skipwhite nextgroup=muttrcAliasGroupDef,muttrcAliasKey,muttrcAliasNL
 syn match muttrcAliasGroupDefNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasGroupName,muttrcAliasGroupDefNL
 syn match muttrcAliasGroupDef	contained /\s*-group/ skipwhite nextgroup=muttrcAliasGroupName,muttrcAliasGroupDefNL contains=muttrcGroupFlag
-syn match muttrcAliasEmail	contained /\S\+@\S\+/ contains=muttrcEmail nextgroup=muttrcAliasName,muttrcAliasNameNL
-syn match muttrcAliasEncEmail	contained /<[^>]\+>/ contains=muttrcEmail
+syn match muttrcAliasComma	contained /,/ skipwhite nextgroup=muttrcAliasEmail,muttrcAliasEncEmail,muttrcAliasNameNoParens,muttrcAliasENNL
+syn match muttrcAliasEmail	contained /\S\+@\S\+/ contains=muttrcEmail nextgroup=muttrcAliasName,muttrcAliasNameNL skipwhite
+syn match muttrcAliasEncEmail	contained /<[^>]\+>/ contains=muttrcEmail nextgroup=muttrcAliasComma
 syn match muttrcAliasEncEmailNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasEncEmail,muttrcAliasEncEmailNL
 syn match muttrcAliasNameNoParens contained /[^<(@]\+\s\+/ nextgroup=muttrcAliasEncEmail,muttrcAliasEncEmailNL
 syn region muttrcAliasName	contained matchgroup=Type start=/(/ end=/)/ skipwhite
 syn match muttrcAliasNameNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasName,muttrcAliasNameNL
-syn match muttrcAliasENNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasEmail,muttrcAliasNameNoParens,muttrcAliasENNL
-syn match muttrcAliasAbbr	contained /\s*[^- \t]\S\+/ skipwhite nextgroup=muttrcAliasEmail,muttrcAliasNameNoParens,muttrcAliasENNL
-syn match muttrcAliasNL		contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasGroupDef,muttrcAliasAbbr,muttrcAliasNL
-syn match muttrcAlias		/^\s*alias\s/ skipwhite nextgroup=muttrcAliasGroupDef,muttrcAliasAbbr,muttrcAliasNL
+syn match muttrcAliasENNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasEmail,muttrcAliasEncEmail,muttrcAliasNameNoParens,muttrcAliasENNL
+syn match muttrcAliasKey	contained /\s*[^- \t]\S\+/ skipwhite nextgroup=muttrcAliasEmail,muttrcAliasEncEmail,muttrcAliasNameNoParens,muttrcAliasENNL
+syn match muttrcAliasNL		contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasGroupDef,muttrcAliasKey,muttrcAliasNL
+syn match muttrcAlias		/^\s*alias\s/ skipwhite nextgroup=muttrcAliasGroupDef,muttrcAliasKey,muttrcAliasNL
 
-syn match muttrcUnAliasAbbr	contained "\s*\w\+\s*" skipwhite nextgroup=muttrcUnAliasAbbr,muttrcUnAliasNL
-syn match muttrcUnAliasNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcUnAliasAbbr,muttrcUnAliasNL
-syn match muttrcUnAlias		/^\s*unalias\s\?/ nextgroup=muttrcUnAliasAbbr,muttrcUnAliasNL
+syn match muttrcUnAliasKey	contained "\s*\w\+\s*" skipwhite nextgroup=muttrcUnAliasKey,muttrcUnAliasNL
+syn match muttrcUnAliasNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcUnAliasKey,muttrcUnAliasNL
+syn match muttrcUnAlias		/^\s*unalias\s\?/ nextgroup=muttrcUnAliasKey,muttrcUnAliasNL
 
 syn match muttrcSimplePat contained "!\?\^\?[~][ADEFgGklNOpPQRSTuUvV=$]"
 syn match muttrcSimplePat contained "!\?\^\?[~][mnXz]\s\+\%([<>-][0-9]\+\|[0-9]\+[-][0-9]*\)"
 syn match muttrcSimplePat contained "!\?\^\?[~][dr]\s\+[0-9]\{2}\%(/[0-9]\{2}\%(/[0-9]\{2}\%([0-9]\{2}\)\)\?\)\?"
 syn match muttrcSimplePat contained "!\?\^\?[~][bBcCefhHiLstxy]\s\+" nextgroup=muttrcSimplePatRXContainer
-syn match muttrcSimplePat contained "!\?\^\?[%][bBcCefhHiLstxy]\s\+" nextgroup=muttrcSimplePatGroup
+syn match muttrcSimplePat contained "!\?\^\?[%][bBcCefhHiLstxy]\s\+" nextgroup=muttrcSimplePatString
+syn match muttrcSimplePat contained "!\?\^\?[=][bh]\s\+" nextgroup=muttrcSimplePatString
 "syn match muttrcSimplePat contained /"[^~=%][^"]*/ contains=muttrcRXPat
 "syn match muttrcSimplePat contained /'[^~=%][^']*/ contains=muttrcRXPat
-syn match muttrcSimplePatGroup contained /[a-zA-Z0-9]\+/
+syn match muttrcSimplePatString contained /[a-zA-Z0-9]\+/
+syn region muttrcSimplePatString contained keepend start=+"+ end=+"+ skip=+\\"+
+syn region muttrcSimplePatString contained keepend start=+'+ end=+'+ skip=+\\'+
 syn region muttrcSimplePatRXContainer contained keepend start=+"+ end=+"+ skip=+\\"+ contains=muttrcRXPat
 syn region muttrcSimplePatRXContainer contained keepend start=+'+ end=+'+ skip=+\\'+ contains=muttrcRXPat
 syn match muttrcSimplePatRXContainer contained /\S\+/ contains=muttrcRXPat
@@ -450,8 +462,8 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcRXDef		muttrcGroupFlag
   HiLink muttrcRXPat		String
   HiLink muttrcAliasGroupName	Macro
-  HiLink muttrcAliasAbbr	Identifier
-  HiLink muttrcUnAliasAbbr	Identifier
+  HiLink muttrcAliasKey	Identifier
+  HiLink muttrcUnAliasKey	Identifier
   HiLink muttrcAliasEncEmail	Identifier
   HiLink muttrcAliasParens	Type
   HiLink muttrcNumber		Number
@@ -474,6 +486,7 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcToggle		muttrcCommand
   HiLink muttrcBind		muttrcCommand
   HiLink muttrcMacro		muttrcCommand
+  HiLink muttrcMacroDescr	String
   HiLink muttrcAlias		muttrcCommand
   HiLink muttrcUnAlias		muttrcCommand
   HiLink muttrcUnhook		muttrcCommand
@@ -508,7 +521,7 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcMonoAttrib	muttrcColor
   HiLink muttrcMono		muttrcCommand
   HiLink muttrcSimplePat	Identifier
-  HiLink muttrcSimplePatGroup	Macro
+  HiLink muttrcSimplePatString	Macro
   HiLink muttrcSimplePatMetas	Special
   HiLink muttrcPattern		Type
   HiLink muttrcPatternInner	Error
@@ -520,6 +533,29 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcRXHookNot	Type
   HiLink muttrcPatHooks		muttrcCommand
   HiLink muttrcPatHookNot	Type
+
+  HiLink muttrcBindFunctionNL	SpecialChar
+  HiLink muttrcBindKeyNL	SpecialChar
+  HiLink muttrcBindMenuListNL	SpecialChar
+  HiLink muttrcMacroDescrNL	SpecialChar
+  HiLink muttrcMacroBodyNL	SpecialChar
+  HiLink muttrcMacroKeyNL	SpecialChar
+  HiLink muttrcMacroMenuListNL	SpecialChar
+  HiLink muttrcColorMatchCountNL SpecialChar
+  HiLink muttrcColorNL		SpecialChar
+  HiLink muttrcColorRXNL	SpecialChar
+  HiLink muttrcColorBGNL	SpecialChar
+  HiLink muttrcColorFGNL	SpecialChar
+  HiLink muttrcAliasNameNL	SpecialChar
+  HiLink muttrcAliasENNL	SpecialChar
+  HiLink muttrcAliasNL		SpecialChar
+  HiLink muttrcUnAliasNL	SpecialChar
+  HiLink muttrcAliasGroupDefNL	SpecialChar
+  HiLink muttrcAliasEncEmailNL	SpecialChar
+  HiLink muttrcPatternNL	SpecialChar
+  HiLink muttrcUnColorPatNL	SpecialChar
+  HiLink muttrcUnColorAPNL	SpecialChar
+  HiLink muttrcUnColorIndexNL	SpecialChar
 
   delcommand HiLink
 endif
