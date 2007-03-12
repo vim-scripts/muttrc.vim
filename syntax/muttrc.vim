@@ -2,9 +2,9 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	2 Dec 2006
+" Last Change:	5 Mar 2007
 
-" This file covers mutt version 1.5.13 (and most of CVS HEAD)
+" This file covers mutt version 1.5.14 (and most of CVS HEAD)
 " Included are also a few features from 1.4.2.1
 
 " For version 5.x: Clear all syntax items
@@ -22,7 +22,9 @@ else
   setlocal isk=@,48-57,_,-
 endif
 
-syn match muttrcComment		"^#.*$"
+syn match muttrcComment		"^# .*$" contains=@Spell
+syn match muttrcComment		"^#[^ ].*$"
+syn match muttrcComment		"^#$"
 syn match muttrcComment		"[^\\]#.*$"lc=1
 
 " Escape sequences (back-tick and pipe goes here too)
@@ -202,9 +204,9 @@ syn keyword muttrcVarQuad	contained invpostpone invprint invquit invrecall invre
 
 syn keyword muttrcVarNum	contained connect_timeout history imap_keepalive mail_check menu_context net_inc
 syn keyword muttrcVarNum	contained pager_context pager_index_lines pgp_timeout pop_checkinterval read_inc
-syn keyword muttrcVarNum	contained score_threshold_delete score_threshold_flag score_threshold_read
-syn keyword muttrcVarNum	contained sendmail_wait sleep_time smime_timeout ssl_min_dh_prime_bits timeout
-syn keyword muttrcVarNum	contained wrapmargin write_inc
+syn keyword muttrcVarNum	contained save_history score_threshold_delete score_threshold_flag
+syn keyword muttrcVarNum	contained score_threshold_read sendmail_wait sleep_time smime_timeout
+syn keyword muttrcVarNum	contained ssl_min_dh_prime_bits timeout wrap wrapmargin write_inc
 
 syn match muttrcVarStr		contained 'my_[a-zA-Z0-9_]\+'
 syn keyword muttrcVarStr	contained alias_file alias_format assumed_charset attach_format attach_sep attribution
@@ -212,7 +214,7 @@ syn keyword muttrcVarStr	contained certificate_file charset compose_format confi
 syn keyword muttrcVarStr	contained date_format default_hook display_filter dotlock_program dsn_notify
 syn keyword muttrcVarStr	contained dsn_return editor entropy_file envelope_from_address escape folder
 syn keyword muttrcVarStr	contained folder_format forw_format forward_format from gecos_mask hdr_format
-syn keyword muttrcVarStr	contained header_cache header_cache_pagesize hostname imap_authenticators
+syn keyword muttrcVarStr	contained header_cache header_cache_pagesize history_file hostname imap_authenticators
 syn keyword muttrcVarStr	contained imap_delim_chars imap_headers imap_home_namespace imap_idle imap_login imap_pass
 syn keyword muttrcVarStr	contained imap_user indent_str indent_string index_format ispell locale mailcap_path
 syn keyword muttrcVarStr	contained mask mbox mbox_type message_format message_cachedir mh_seq_flagged mh_seq_replied
@@ -370,7 +372,7 @@ syn match muttrcUnAlias		/^\s*unalias\s\?/ nextgroup=muttrcUnAliasKey,muttrcUnAl
 
 syn match muttrcSimplePat contained "!\?\^\?[~][ADEFgGklNOpPQRSTuUvV=$]"
 syn match muttrcSimplePat contained "!\?\^\?[~][mnXz]\s\+\%([<>-][0-9]\+\|[0-9]\+[-][0-9]*\)"
-syn match muttrcSimplePat contained "!\?\^\?[~][dr]\s\+[0-9]\{2}\%(/[0-9]\{2}\%(/[0-9]\{2}\%([0-9]\{2}\)\)\?\)\?"
+syn match muttrcSimplePat contained "!\?\^\?[~][dr]\s\+\%(\%(-\?[0-9]\{1,2}\%(/[0-9]\{1,2}\%(/[0-9]\{2}\%([0-9]\{2}\)\?\)\?\)\?\%([+*-][0-9]\+[ymwd]\)*\)\|\%(\%([0-9]\{1,2}\%(/[0-9]\{1,2}\%(/[0-9]\{2}\%([0-9]\{2}\)\?\)\?\)\?\%([+*-][0-9]\+[ymwd]\)*\)-\%([0-9]\{1,2}\%(/[0-9]\{1,2}\%(/[0-9]\{2}\%([0-9]\{2}\)\?\)\?\)\?\%([+*-][0-9]\+[ymwd]\)\?\)\?\)\|\%([<>=][0-9]\+[ymwd]\)\)"
 syn match muttrcSimplePat contained "!\?\^\?[~][bBcCefhHiLstxy]\s\+" nextgroup=muttrcSimplePatRXContainer
 syn match muttrcSimplePat contained "!\?\^\?[%][bBcCefhHiLstxy]\s\+" nextgroup=muttrcSimplePatString
 syn match muttrcSimplePat contained "!\?\^\?[=][bh]\s\+" nextgroup=muttrcSimplePatString
