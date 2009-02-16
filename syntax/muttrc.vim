@@ -2,7 +2,7 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	28 Jan 2009
+" Last Change:	16 Feb 2009
 
 " This file covers mutt version 1.5.19 (and most of the mercurial tip)
 " Included are also a few features from 1.4.2.1
@@ -34,10 +34,11 @@ syn match muttrcEscape		+\\$+
 
 " The variables takes the following arguments
 "syn match  muttrcString		contained "=\s*[^ #"'`]\+"lc=1 contains=muttrcEscape
-syn region muttrcString		contained start=+"+ms=e skip=+\\"+ end=+"+ contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcCommand,muttrcAction,muttrcShellString
-syn region muttrcString		contained start=+'+ms=e skip=+\\'+ end=+'+ contains=muttrcEscape,muttrcSet,muttrcUnset,muttrcReset,muttrcToggle,muttrcCommand,muttrcAction
+syn region muttrcString		contained keepend start=+"+ms=e skip=+\\"+ end=+"+ contains=muttrcEscape,muttrcCommand,muttrcAction,muttrcShellString
+syn region muttrcString		contained keepend start=+'+ms=e skip=+\\'+ end=+'+ contains=muttrcEscape,muttrcCommand,muttrcAction
+syn match muttrcStringNL	contained skipwhite skipnl "\s*\\$" nextgroup=muttrcString,muttrcStringNL
 
-syn region muttrcShellString	matchgroup=muttrcEscape keepend start=+`+ skip=+\\`+ end=+`+ contains=muttrcVarStr,muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcCommand,muttrcSet
+syn region muttrcShellString	matchgroup=muttrcEscape keepend start=+`+ skip=+\\`+ end=+`+ contains=muttrcVarStr,muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcCommand
 
 syn match  muttrcRXChars	contained /[^\\][][.*?+]\+/hs=s+1
 syn match  muttrcRXChars	contained /[][|()][.*?+]*/
@@ -45,13 +46,23 @@ syn match  muttrcRXChars	contained /['"]^/ms=s+1
 syn match  muttrcRXChars	contained /$['"]/me=e-1
 syn match  muttrcRXChars	contained /\\/
 " Why does muttrcRXString2 work with one \ when muttrcRXString requires two?
-syn region muttrcRXString	contained start=+'+ skip=+\\'+ end=+'+ contains=muttrcRXChars
-syn region muttrcRXString	contained start=+"+ skip=+\\"+ end=+"+ contains=muttrcRXChars
+syn region muttrcRXString	contained skipwhite start=+'+ skip=+\\'+ end=+'+ contains=muttrcRXChars
+syn region muttrcRXString	contained skipwhite start=+"+ skip=+\\"+ end=+"+ contains=muttrcRXChars
 syn region muttrcRXString	contained skipwhite start=+[^ 	"'^]+ skip=+\\\s+ end=+\s+re=e-1 contains=muttrcRXChars
 " For some reason, skip refuses to match backslashes here...
 syn region muttrcRXString	contained matchgroup=muttrcRXChars skipwhite start=+\^+ end=+[^\\]\s+re=e-1 contains=muttrcRXChars
-syn region muttrcRXString2	contained start=+'+ skip=+\'+ end=+'+ contains=muttrcRXChars
-syn region muttrcRXString2	contained start=+"+ skip=+\"+ end=+"+ contains=muttrcRXChars
+syn region muttrcRXString	contained matchgroup=muttrcRXChars skipwhite start=+\^+ end=+$\s+ contains=muttrcRXChars
+syn region muttrcRXString2	contained skipwhite start=+'+ skip=+\'+ end=+'+ contains=muttrcRXChars
+syn region muttrcRXString2	contained skipwhite start=+"+ skip=+\"+ end=+"+ contains=muttrcRXChars
+
+" these must be kept synchronized with muttrcRXString, but are intended for
+" muttrcRXHooks
+syn region muttrcRXHookString	contained keepend skipwhite start=+'+ skip=+\\'+ end=+'+ contains=muttrcRXString nextgroup=muttrcString,muttrcStringNL
+syn region muttrcRXHookString	contained keepend skipwhite start=+"+ skip=+\\"+ end=+"+ contains=muttrcRXString nextgroup=muttrcString,muttrcStringNL
+syn region muttrcRXHookString	contained keepend skipwhite start=+[^ 	"'^]+ skip=+\\\s+ end=+\s+re=e-1 contains=muttrcRXString nextgroup=muttrcString,muttrcStringNL
+syn region muttrcRXHookString	contained keepend skipwhite start=+\^+ end=+[^\\]\s+re=e-1 contains=muttrcRXString nextgroup=muttrcString,muttrcStringNL
+syn region muttrcRXHookString	contained keepend matchgroup=muttrcRXChars skipwhite start=+\^+ end=+$\s+ contains=muttrcRXString nextgroup=muttrcString,muttrcStringNL
+syn match muttrcRXHookStringNL contained skipwhite skipnl "\s*\\$" nextgroup=muttrcRXHookString,muttrcRXHookStringNL
 
 " these are exclusively for args lists (e.g. -rx pat pat pat ...)
 syn region muttrcRXPat		contained keepend skipwhite start=+'+ skip=+\\'+ end=+'\s*+ contains=muttrcRXString nextgroup=muttrcRXPat
@@ -256,6 +267,7 @@ syn region muttrcStrftimeFormatStr contained skipwhite keepend start=+'+ skip=+\
 
 " The following info was pulled from hdr_format_str in hdrline.c
 syn match muttrcIndexFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[aAbBcCdDeEfFHilLmMnNOPsStTuvXyYZ%]/
+syn match muttrcIndexFormatEscapes contained /%[>|*]./
 syn match muttrcIndexFormatConditionals contained /%?[EFHlLMNOXyY]?/ nextgroup=muttrcFormatConditionals2
 " The following info was pulled from alias_format_str in addrbook.c
 syn match muttrcAliasFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[afnrt%]/
@@ -370,24 +382,24 @@ syn keyword muttrcMenu		contained alias attach browser compose editor index page
 syn match muttrcMenuList "\S\+" contained contains=muttrcMenu
 syn match muttrcMenuCommas /,/ contained
 
-syn keyword muttrcCommand	auto_view alternative_order charset-hook exec unalternative_order
+syn keyword muttrcHooks		contained skipwhite account-hook charset-hook iconv-hook message-hook folder-hook mbox-hook save-hook fcc-hook fcc-save-hook send-hook send2-hook reply-hook crypt-hook
+
+syn keyword muttrcCommand	auto_view alternative_order exec unalternative_order
 syn keyword muttrcCommand	hdr_order iconv-hook ignore mailboxes my_hdr unmailboxes
 syn keyword muttrcCommand	pgp-hook push score source unauto_view unhdr_order
 syn keyword muttrcCommand	unignore unmono unmy_hdr unscore
 syn keyword muttrcCommand	mime_lookup unmime_lookup ungroup
 syn keyword muttrcCommand	unalternative_order
+syn keyword muttrcCommand	skipwhite charset-hook nextgroup=muttrcRXString
+syn keyword muttrcCommand	skipwhite unhook nextgroup=muttrcHooks
 
-syn keyword muttrcSpam 		skipwhite spam nextgroup=muttrcSpamPattern
-syn region muttrcSpamPattern	contained skipwhite keepend start=+'+ skip=+\\'+ end=+'+ contains=muttrcPattern nextgroup=muttrcString
-syn region muttrcSpamPattern	contained skipwhite keepend start=+"+ skip=+\\"+ end=+"+ contains=muttrcPattern nextgroup=muttrcString
+syn keyword muttrcCommand 	skipwhite spam nextgroup=muttrcSpamPattern
+syn region muttrcSpamPattern	contained skipwhite keepend start=+'+ skip=+\\'+ end=+'+ contains=muttrcPattern nextgroup=muttrcString,muttrcStringNL
+syn region muttrcSpamPattern	contained skipwhite keepend start=+"+ skip=+\\"+ end=+"+ contains=muttrcPattern nextgroup=muttrcString,muttrcStringNL
 
-syn keyword muttrcNoSpam 	skipwhite nospam nextgroup=muttrcNoSpamPattern
+syn keyword muttrcCommand 	skipwhite nospam nextgroup=muttrcNoSpamPattern
 syn region muttrcNoSpamPattern	contained skipwhite keepend start=+'+ skip=+\\'+ end=+'+ contains=muttrcPattern
 syn region muttrcNoSpamPattern	contained skipwhite keepend start=+"+ skip=+\\"+ end=+"+ contains=muttrcPattern
-
-syn keyword muttrcHooks		contained account-hook charset-hook iconv-hook message-hook folder-hook mbox-hook save-hook fcc-hook fcc-save-hook send-hook send2-hook reply-hook crypt-hook
-syn keyword muttrcUnhook	contained unhook
-syn region muttrcUnhookLine	keepend start=+\<unhook\>+ skip=+\\$\|\\;+ end=+$\|;+ contains=muttrcUnhook,muttrcHooks,muttrcUnHighlightSpace,muttrcComment
 
 syn match muttrcAttachmentsMimeType contained "[*a-z0-9_-]\+/[*a-z0-9._-]\+\s*" skipwhite nextgroup=muttrcAttachmentsMimeType
 syn match muttrcAttachmentsFlag contained "[+-]\%([AI]\|inline\|attachment\)\s\+" skipwhite nextgroup=muttrcAttachmentsMimeType
@@ -430,6 +442,7 @@ syn match muttrcFunction	contained "\<search\%(-\%(next\|opposite\|reverse\|togg
 syn match muttrcFunction	contained "\<show-\%(limit\|version\)\>"
 syn match muttrcFunction	contained "\<sort-\%(mailbox\|reverse\)\>"
 syn match muttrcFunction	contained "\<tag-\%(pattern\|\%(sub\)\?thread\|prefix\%(-cond\)\?\)\>"
+syn match muttrcFunction	contained "\<end-cond\>"
 syn match muttrcFunction	contained "\<toggle-\%(mailboxes\|new\|quoted\|subscribed\|unlink\|write\)\>"
 syn match muttrcFunction	contained "\<undelete-\%(pattern\|subthread\)\>"
 syn match muttrcFunction	contained "\<collapse-\%(parts\|thread\|all\)\>"
@@ -437,18 +450,19 @@ syn match muttrcFunction	contained "\<view-\%(attach\|attachments\|file\|mailcap
 syn match muttrcFunction	contained "\<\%(backspace\|backward-char\|bol\|bottom\|bottom-page\|buffy-cycle\|clear-flag\|complete\%(-query\)\?\|copy-file\|create-alias\|detach-file\|eol\|exit\|extract-keys\|\%(imap-\)\?fetch-mail\|forget-passphrase\|forward-char\|group-reply\|help\|ispell\|jump\|limit\|list-reply\|mail\|mail-key\|mark-as-new\|middle-page\|new-mime\|noop\|pgp-menu\|query\|query-append\|quit\|quote-char\|read-subthread\|redraw-screen\|refresh\|rename-file\|reply\|select-new\|set-flag\|shell-escape\|skip-quoted\|sort\|subscribe\|sync-mailbox\|top\|top-page\|transpose-chars\|unsubscribe\|untag-pattern\|verify-key\|what-key\|write-fcc\)\>"
 syn match muttrcAction		contained "<[^>]\{-}>" contains=muttrcBadAction,muttrcFunction,muttrcKeyName
 
-syn keyword muttrcSet		set     skipwhite nextgroup=muttrcVPrefix,muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
-syn keyword muttrcUnset		unset   skipwhite nextgroup=muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
-syn keyword muttrcReset		reset   skipwhite nextgroup=muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
-syn keyword muttrcToggle	toggle  skipwhite nextgroup=muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
+syn keyword muttrcCommand	set     skipwhite nextgroup=muttrcVPrefix,muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
+syn keyword muttrcCommand	unset   skipwhite nextgroup=muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
+syn keyword muttrcCommand	reset   skipwhite nextgroup=muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
+syn keyword muttrcCommand	toggle  skipwhite nextgroup=muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
 
 " First, functions that take regular expressions:
-syn match  muttrcRXHookNot	contained /!\s*/ skipwhite nextgroup=muttrcRXString
-syn match  muttrcRXHooks	/^\s*\%(account\|folder\)-hook\s\+/ skipwhite nextgroup=muttrcRXHookNot,muttrcRXString
+syn match  muttrcRXHookNot	contained /!\s*/ skipwhite nextgroup=muttrcRXHookString,muttrcRXHookStringNL
+syn match  muttrcRXHooks	/\<\%(account\|folder\)-hook\>/ skipwhite nextgroup=muttrcRXHookNot,muttrcRXHookString,muttrcRXHookStringNL
 
 " Now, functions that take patterns
 syn match muttrcPatHookNot	contained /!\s*/ skipwhite nextgroup=muttrcPattern
-syn match muttrcPatHooks	/\<\%(message\|mbox\|save\|fcc\%(-save\)\?\|send\|send2\|reply\|crypt\)-hook\>/ skipwhite nextgroup=muttrcPatHookNot,muttrcPattern
+syn match muttrcPatHooks	/\<\%(mbox\|crypt\)-hook\>/ skipwhite nextgroup=muttrcPatHookNot,muttrcPattern
+syn match muttrcPatHooks	/\<\%(message\|reply\|send\|send2\|save\|\|fcc\%(-save\)\?\)-hook\>/ skipwhite nextgroup=muttrcPatHookNot,muttrcOptPattern
 
 syn match muttrcBindFunction	contained /\S\+\>/ skipwhite contains=muttrcFunction
 syn match muttrcBindFunctionNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcBindFunction,muttrcBindFunctionNL
@@ -456,7 +470,7 @@ syn match muttrcBindKey		contained /\S\+/ skipwhite contains=muttrcKey nextgroup
 syn match muttrcBindKeyNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcBindKey,muttrcBindKeyNL
 syn match muttrcBindMenuList	contained /\S\+/ skipwhite contains=muttrcMenu,muttrcMenuCommas nextgroup=muttrcBindKey,muttrcBindKeyNL
 syn match muttrcBindMenuListNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcBindMenuList,muttrcBindMenuListNL
-syn keyword muttrcBind		skipwhite bind nextgroup=muttrcBindMenuList,muttrcBindMenuListNL
+syn keyword muttrcCommand	skipwhite bind nextgroup=muttrcBindMenuList,muttrcBindMenuListNL
 
 syn region muttrcMacroDescr	contained keepend skipwhite start=+\s*\S+ms=e skip=+\\ + end=+ \|$+me=s
 syn region muttrcMacroDescr	contained keepend skipwhite start=+'+ms=e skip=+\\'+ end=+'+me=s
@@ -470,7 +484,7 @@ syn match muttrcMacroKey	contained /\S\+/ skipwhite contains=muttrcKey nextgroup
 syn match muttrcMacroKeyNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcMacroKey,muttrcMacroKeyNL
 syn match muttrcMacroMenuList	contained /\S\+/ skipwhite contains=muttrcMenu,muttrcMenuCommas nextgroup=muttrcMacroKey,muttrcMacroKeyNL
 syn match muttrcMacroMenuListNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcMacroMenuList,muttrcMacroMenuListNL
-syn keyword muttrcMacro		skipwhite macro	nextgroup=muttrcMacroMenuList,muttrcMacroMenuListNL
+syn keyword muttrcCommand	skipwhite macro	nextgroup=muttrcMacroMenuList,muttrcMacroMenuListNL
 
 syn match muttrcAddrContent	contained "[a-zA-Z0-9._-]\+@[a-zA-Z0-9./-]\+\s*" skipwhite contains=muttrcEmail nextgroup=muttrcAddrContent
 syn region muttrcAddrContent	contained start=+'+ end=+'\s*+ skip=+\\'+ skipwhite contains=muttrcEmail nextgroup=muttrcAddrContent
@@ -496,11 +510,11 @@ syn match muttrcAliasNameNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrc
 syn match muttrcAliasENNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasEmail,muttrcAliasEncEmail,muttrcAliasNameNoParens,muttrcAliasENNL
 syn match muttrcAliasKey	contained /\s*[^- \t]\S\+/ skipwhite nextgroup=muttrcAliasEmail,muttrcAliasEncEmail,muttrcAliasNameNoParens,muttrcAliasENNL
 syn match muttrcAliasNL		contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcAliasGroupDef,muttrcAliasKey,muttrcAliasNL
-syn match muttrcAlias		/^\s*alias\s/ skipwhite nextgroup=muttrcAliasGroupDef,muttrcAliasKey,muttrcAliasNL
+syn keyword muttrcCommand	skipwhite alias nextgroup=muttrcAliasGroupDef,muttrcAliasKey,muttrcAliasNL
 
 syn match muttrcUnAliasKey	contained "\s*\w\+\s*" skipwhite nextgroup=muttrcUnAliasKey,muttrcUnAliasNL
 syn match muttrcUnAliasNL	contained /\s*\\$/ skipwhite skipnl nextgroup=muttrcUnAliasKey,muttrcUnAliasNL
-syn match muttrcUnAlias		/^\s*unalias\s\?/ nextgroup=muttrcUnAliasKey,muttrcUnAliasNL
+syn keyword muttrcCommand	skipwhite unalias nextgroup=muttrcUnAliasKey,muttrcUnAliasNL
 
 syn match muttrcSimplePat contained "!\?\^\?[~][ADEFgGklNOpPQRSTuUvV=$]"
 syn match muttrcSimplePat contained "!\?\^\?[~][mnXz]\s*\%([<>-][0-9]\+[kM]\?\|[0-9]\+[kM]\?[-]\%([0-9]\+[kM]\?\)\?\)"
@@ -518,9 +532,19 @@ syn region muttrcSimplePatRXContainer contained keepend start=+'+ end=+'+ skip=+
 syn region muttrcSimplePatRXContainer contained keepend start=+[^ 	"']+ skip=+\\ + end=+\s+re=e-1 contains=muttrcRXString
 syn match muttrcSimplePatMetas contained /[(|)]/
 
-syn region muttrcPattern contained matchgroup=Type keepend start=+"+ skip=+\\"+ end=+"+ contains=muttrcSimplePat,muttrcUnHighlightSpace,muttrcSimplePatMetas
-syn region muttrcPattern contained matchgroup=Type keepend start=+'+ skip=+\\'+ end=+'+ contains=muttrcSimplePat,muttrcUnHighlightSpace,muttrcSimplePatMetas
-syn match muttrcPattern contained "[~]\([A-Za-z]\|([^)]\+)\)" contains=muttrcSimplePat
+syn match muttrcOptSimplePat contained skipwhite /[~=%!(^].*/ contains=muttrcSimplePat,muttrcSimplePatMetas
+syn match muttrcOptSimplePat contained skipwhite /[^~=%!(^].*/ contains=muttrcRXString
+syn region muttrcOptPattern contained matchgroup=Type keepend start=+"+ skip=+\\"+ end=+"+ contains=muttrcOptSimplePat,muttrcUnHighlightSpace nextgroup=muttrcString,muttrcStringNL
+syn region muttrcOptPattern contained matchgroup=Type keepend skipwhite start=+'+ skip=+\\'+ end=+'+ contains=muttrcOptSimplePat,muttrcUnHighlightSpace nextgroup=muttrcString,muttrcStringNL
+syn region muttrcOptPattern contained keepend skipwhite start=+[~](+ end=+)+ skip=+\\)+ contains=muttrcSimplePat nextgroup=muttrcString,muttrcStringNL
+syn match muttrcOptPattern contained skipwhite /[~][A-Za-z]/ contains=muttrcSimplePat nextgroup=muttrcString,muttrcStringNL
+syn match muttrcOptPattern contained skipwhite /[.]/ nextgroup=muttrcString,muttrcStringNL
+" Keep muttrcPattern and muttrcOptPattern synchronized
+syn region muttrcPattern contained matchgroup=Type keepend skipwhite start=+"+ skip=+\\"+ end=+"+ contains=muttrcSimplePat,muttrcUnHighlightSpace,muttrcSimplePatMetas
+syn region muttrcPattern contained matchgroup=Type keepend skipwhite start=+'+ skip=+\\'+ end=+'+ contains=muttrcSimplePat,muttrcUnHighlightSpace,muttrcSimplePatMetas
+syn region muttrcPattern contained keepend skipwhite start=+[~](+ end=+)+ skip=+\\)+ contains=muttrcSimplePat
+syn match muttrcPattern contained skipwhite /[~][A-Za-z]/ contains=muttrcSimplePat
+syn match muttrcPattern contained skipwhite /[.]/
 syn region muttrcPatternInner contained keepend start=+"[~=%!(^]+ms=s+1 skip=+\\"+ end=+"+me=e-1 contains=muttrcSimplePat,muttrcUnHighlightSpace,muttrcSimplePatMetas
 syn region muttrcPatternInner contained keepend start=+'[~=%!(^]+ms=s+1 skip=+\\'+ end=+'+me=e-1 contains=muttrcSimplePat,muttrcUnHighlightSpace,muttrcSimplePatMetas
 
@@ -627,19 +651,7 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcVarStr		Identifier
   HiLink muttrcMenu		Identifier
   HiLink muttrcCommand		Keyword
-  HiLink muttrcSpam		muttrcCommand
-  HiLink muttrcNoSpam		muttrcCommand
-  HiLink muttrcSet		muttrcCommand
-  HiLink muttrcUnset		muttrcCommand
-  HiLink muttrcReset		muttrcCommand
-  HiLink muttrcToggle		muttrcCommand
-  HiLink muttrcBind		muttrcCommand
-  HiLink muttrcMacro		muttrcCommand
   HiLink muttrcMacroDescr	String
-  HiLink muttrcAlias		muttrcCommand
-  HiLink muttrcUnAlias		muttrcCommand
-  HiLink muttrcUnhook		muttrcCommand
-  HiLink muttrcUnhookLine	Error
   HiLink muttrcAction		Macro
   HiLink muttrcBadAction	Error
   HiLink muttrcBindFunction	Error
@@ -744,6 +756,7 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcUnColorPatNL	SpecialChar
   HiLink muttrcUnColorAPNL	SpecialChar
   HiLink muttrcUnColorIndexNL	SpecialChar
+  HiLink muttrcStringNL		SpecialChar
 
   delcommand HiLink
 endif
