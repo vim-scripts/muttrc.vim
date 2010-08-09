@@ -2,7 +2,7 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	15 Jun 2009
+" Last Change:	9 Aug 2010
 
 " This file covers mutt version 1.5.20 (and most of the mercurial tip)
 " Included are also a few features from 1.4.2.1
@@ -283,7 +283,7 @@ syn match muttrcFormatConditionals2 contained /[^?]*?/
 syn match muttrcComposeFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[ahlv%]/
 syn match muttrcComposeFormatEscapes contained /%[>|*]./
 " The following info was pulled from folder_format_str in browser.c
-syn match muttrcFolderFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[CdfFglNstu%]/
+syn match muttrcFolderFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[CDdfFglNstu%]/
 syn match muttrcFolderFormatEscapes contained /%[>|*]./
 syn match muttrcFolderFormatConditionals contained /%?[N]?/
 " The following info was pulled from mix_entry_fmt in remailer.c
@@ -407,11 +407,12 @@ syn match muttrcAttachmentsLine "^\s*\%(un\)\?attachments\s\+" skipwhite nextgro
 
 syn match muttrcUnHighlightSpace contained "\%(\s\+\|\\$\)"
 
-syn keyword muttrcListsKeyword	contained lists unlists
-syn region muttrcListsLine	keepend start=+^\s*\%(un\)\?lists\s+ skip=+\\$+ end=+$+ contains=muttrcListsKeyword,muttrcRXPat,muttrcGroupDef,muttrcUnHighlightSpace,muttrcComment
+syn keyword muttrcAsterisk	contained *
+syn keyword muttrcListsKeyword	lists skipwhite nextgroup=muttrcGroupDef,muttrcComment
+syn keyword muttrcListsKeyword	unlists skipwhite nextgroup=muttrcAsterisk,muttrcComment
 
-syn keyword muttrcSubscribeKeyword	contained subscribe unsubscribe
-syn region muttrcSubscribeLine 	keepend start=+^\s*\%(un\)\?subscribe\s+ skip=+\\$+ end=+$+ contains=muttrcSubscribeKeyword,muttrcRXPat,muttrcGroupDef,muttrcUnHighlightSpace,muttrcComment
+syn keyword muttrcSubscribeKeyword	subscribe nextgroup=muttrcGroupDef,muttrcComment
+syn keyword muttrcSubscribeKeyword	unsubscribe nextgroup=muttrcAsterisk,muttrcComment
 
 syn keyword muttrcAlternateKeyword contained alternates unalternates
 syn region muttrcAlternatesLine keepend start=+^\s*\%(un\)\?alternates\s+ skip=+\\$+ end=+$+ contains=muttrcAlternateKeyword,muttrcGroupDef,muttrcRXPat,muttrcUnHighlightSpace,muttrcComment
@@ -421,7 +422,8 @@ syn match muttrcEscapedVariable	contained "\\\$[a-zA-Z_-]\+"
 
 syn match muttrcBadAction	contained "[^<>]\+" contains=muttrcEmail
 syn match muttrcFunction	contained "\<\%(attach\|bounce\|copy\|delete\|display\|flag\|forward\|parent\|pipe\|postpone\|print\|recall\|resend\|save\|send\|tag\|undelete\)-message\>"
-syn match muttrcFunction	contained "\<\%(delete\|next\|previous\|read\|tag\|undelete\)-thread\>"
+syn match muttrcFunction	contained "\<\%(delete\|next\|previous\|read\|tag\|break\|undelete\)-thread\>"
+syn match muttrcFunction	contained "\<link-threads\>"
 syn match muttrcFunction	contained "\<\%(backward\|capitalize\|downcase\|forward\|kill\|upcase\)-word\>"
 syn match muttrcFunction	contained "\<\%(delete\|filter\|first\|last\|next\|pipe\|previous\|print\|save\|select\|tag\|undelete\)-entry\>"
 syn match muttrcFunction	contained "\<attach-\%(file\|key\)\>"
