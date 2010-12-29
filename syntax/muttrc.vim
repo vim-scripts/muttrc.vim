@@ -2,9 +2,9 @@
 " Language:	Mutt setup files
 " Original:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 " Maintainer:	Kyle Wheeler <kyle-muttrc.vim@memoryhole.net>
-" Last Change:	9 Aug 2010
+" Last Change:	29 Dec 2010
 
-" This file covers mutt version 1.5.20 (and most of the mercurial tip)
+" This file covers mutt version 1.5.21 (and most of the mercurial tip)
 " Included are also a few features from 1.4.2.1
 
 " For version 5.x: Clear all syntax items
@@ -417,7 +417,10 @@ syn keyword muttrcSubscribeKeyword	unsubscribe nextgroup=muttrcAsterisk,muttrcCo
 syn keyword muttrcAlternateKeyword contained alternates unalternates
 syn region muttrcAlternatesLine keepend start=+^\s*\%(un\)\?alternates\s+ skip=+\\$+ end=+$+ contains=muttrcAlternateKeyword,muttrcGroupDef,muttrcRXPat,muttrcUnHighlightSpace,muttrcComment
 
-syn match muttrcVariable	contained "\\\@<!\$[a-zA-Z_-]\+"
+" muttrcVariable includes a prefix because partial strings are considered
+" valid.
+syn match muttrcVariable	contained "\\\@<![a-zA-Z_-]*\$[a-zA-Z_-]\+" contains=muttrcVariableInner
+syn match muttrcVariableInner	contained "\$[a-zA-Z_-]\+"
 syn match muttrcEscapedVariable	contained "\\\$[a-zA-Z_-]\+"
 
 syn match muttrcBadAction	contained "[^<>]\+" contains=muttrcEmail
@@ -523,7 +526,7 @@ syn match muttrcSimplePat contained "!\?\^\?[~][mnXz]\s*\%([<>-][0-9]\+[kM]\?\|[
 syn match muttrcSimplePat contained "!\?\^\?[~][dr]\s*\%(\%(-\?[0-9]\{1,2}\%(/[0-9]\{1,2}\%(/[0-9]\{2}\%([0-9]\{2}\)\?\)\?\)\?\%([+*-][0-9]\+[ymwd]\)*\)\|\%(\%([0-9]\{1,2}\%(/[0-9]\{1,2}\%(/[0-9]\{2}\%([0-9]\{2}\)\?\)\?\)\?\%([+*-][0-9]\+[ymwd]\)*\)-\%([0-9]\{1,2}\%(/[0-9]\{1,2}\%(/[0-9]\{2}\%([0-9]\{2}\)\?\)\?\)\?\%([+*-][0-9]\+[ymwd]\)\?\)\?\)\|\%([<>=][0-9]\+[ymwd]\)\|\%(`[^`]\+`\)\|\%(\$[a-zA-Z0-9_-]\+\)\)" contains=muttrcShellString,muttrcVariable
 syn match muttrcSimplePat contained "!\?\^\?[~][bBcCefhHiLstxy]\s*" nextgroup=muttrcSimplePatRXContainer
 syn match muttrcSimplePat contained "!\?\^\?[%][bBcCefhHiLstxy]\s*" nextgroup=muttrcSimplePatString
-syn match muttrcSimplePat contained "!\?\^\?[=][bh]\s*" nextgroup=muttrcSimplePatString
+syn match muttrcSimplePat contained "!\?\^\?[=][bcCefhHiLstxy]\s*" nextgroup=muttrcSimplePatString
 syn region muttrcSimplePat contained keepend start=+!\?\^\?[~](+ end=+)+ contains=muttrcSimplePat
 "syn match muttrcSimplePat contained /'[^~=%][^']*/ contains=muttrcRXString
 syn region muttrcSimplePatString contained keepend start=+"+ end=+"+ skip=+\\"+
@@ -559,7 +562,7 @@ syn keyword muttrcColorField	contained attachment body bold error hdrdefault hea
 syn match   muttrcColorField	contained "\<quoted\d\=\>"
 syn keyword muttrcColor	contained black blue cyan default green magenta red white yellow
 syn keyword muttrcColor	contained brightblack brightblue brightcyan brightdefault brightgreen brightmagenta brightred brightwhite brightyellow
-syn match   muttrcColor	contained "\<\%(bright\)\=color\d\{1,2}\>"
+syn match   muttrcColor	contained "\<\%(bright\)\=color\d\{1,3}\>"
 " Now for the structure of the color line
 syn match muttrcColorRXNL	contained skipnl "\s*\\$" nextgroup=muttrcColorRXPat,muttrcColorRXNL
 syn match muttrcColorBG 	contained /\s*[$]\?\w\+/ contains=muttrcColor,muttrcVariable,muttrcUnHighlightSpace nextgroup=muttrcColorRXPat,muttrcColorRXNL
@@ -641,7 +644,7 @@ if version >= 508 || !exists("did_muttrc_syntax_inits")
   HiLink muttrcSetQuadAssignment	Boolean
   HiLink muttrcSetStrAssignment	String
   HiLink muttrcEmail		Special
-  HiLink muttrcVariable		Special
+  HiLink muttrcVariableInner	Special
   HiLink muttrcEscapedVariable	String
   HiLink muttrcHeader		Type
   HiLink muttrcKeySpecial	SpecialChar
