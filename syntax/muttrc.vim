@@ -303,12 +303,12 @@ syn match muttrcFolderFormatConditionals contained /%?[N]?/
 " The following info was pulled from mix_entry_fmt in remailer.c
 syn match muttrcMixFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[ncsa%]/
 syn match muttrcMixFormatConditionals contained /%?[ncsa]?/
-" The following info was pulled from crypt_entry_fmt in crypt-gpgme.c 
-" and pgp_entry_fmt in pgpkey.c (note that crypt_entry_fmt supports 
+" The following info was pulled from crypt_entry_fmt in crypt-gpgme.c
+" and pgp_entry_fmt in pgpkey.c (note that crypt_entry_fmt supports
 " 'p', but pgp_entry_fmt does not).
 syn match muttrcPGPFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[nkualfctp%]/
 syn match muttrcPGPFormatConditionals contained /%?[nkualfct]?/
-" The following info was pulled from _mutt_fmt_pgp_command in 
+" The following info was pulled from _mutt_fmt_pgp_command in
 " pgpinvoke.c
 syn match muttrcPGPCmdFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[pfsar%]/
 syn match muttrcPGPCmdFormatConditionals contained /%?[pfsar]?/ nextgroup=muttrcFormatConditionals2
@@ -316,11 +316,11 @@ syn match muttrcPGPCmdFormatConditionals contained /%?[pfsar]?/ nextgroup=muttrc
 syn match muttrcStatusFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[bdfFhlLmMnopPrsStuvV%]/
 syn match muttrcStatusFormatEscapes contained /%[>|*]./
 syn match muttrcStatusFormatConditionals contained /%?[bdFlLmMnoptuV]?/ nextgroup=muttrcFormatConditionals2
-" This matches the documentation, but directly contradicts the code 
-" (according to the code, this should be identical to the 
+" This matches the documentation, but directly contradicts the code
+" (according to the code, this should be identical to the
 " muttrcPGPCmdFormatEscapes
 syn match muttrcPGPGetKeysFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[r%]/
-" The following info was pulled from _mutt_fmt_smime_command in 
+" The following info was pulled from _mutt_fmt_smime_command in
 " smime.c
 syn match muttrcSmimeFormatEscapes contained /%\%(\%(-\?[0-9]\+\)\?\%(\.[0-9]\+\)\?\)\?[:_]\?[Cciskaf%]/
 syn match muttrcSmimeFormatConditionals contained /%?[Cciskaf]?/ nextgroup=muttrcFormatConditionals2
@@ -395,7 +395,7 @@ syn keyword muttrcVarBool	contained skipwhite imap_force_ssl noimap_force_ssl in
 "syn keyword muttrcVarQuad	contained pgp_create_traditional nopgp_create_traditional invpgp_create_traditional
 syn keyword muttrcVarStr	contained skipwhite alternates nextgroup=muttrcSetStrAssignment,muttrcVPrefix,muttrcVarBool,muttrcVarQuad,muttrcVarNum,muttrcVarStr
 
-syn keyword muttrcMenu		contained alias attach browser compose editor index pager postpone pgp mix query generic
+syn keyword muttrcMenu		contained alias attach browser compose editor generic index mix pager pgp postpone query smime
 syn match muttrcMenuList "\S\+" contained contains=muttrcMenu
 syn match muttrcMenuCommas /,/ contained
 
@@ -441,7 +441,7 @@ syn match muttrcVariableInner	contained "\$[a-zA-Z_-]\+"
 syn match muttrcEscapedVariable	contained "\\\$[a-zA-Z_-]\+"
 
 syn match muttrcBadAction	contained "[^<>]\+" contains=muttrcEmail
-syn match muttrcFunction	contained "\<\%(attach\|bounce\|copy\|delete\|display\|flag\|forward\|parent\|pipe\|postpone\|print\|recall\|resend\|save\|send\|tag\|undelete\)-message\>"
+syn match muttrcFunction	contained "\<\%(attach\|bounce\|copy\|delete\|display\|edit\|flag\|forward\|parent\|pipe\|postpone\|print\|recall\|resend\|save\|send\|tag\|undelete\)-message\>"
 syn match muttrcFunction	contained "\<\%(delete\|next\|previous\|read\|tag\|break\|undelete\)-thread\>"
 syn match muttrcFunction	contained "\<link-threads\>"
 syn match muttrcFunction	contained "\<\%(backward\|capitalize\|downcase\|forward\|kill\|upcase\)-word\>"
